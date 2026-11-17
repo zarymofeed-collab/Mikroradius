@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#071226"><title>فحص تثبيت MikroShamel</title>
+<style>
+body{font-family:system-ui, sans-serif;background:#071226;color:#eef4ff;padding:20px;line-height:1.8}
+main{max-width:720px;margin:auto}h1{font-size:22px}.item{padding:12px;margin:8px 0;border:1px solid #35527d;border-radius:10px;background:#102344}
+.ok{color:#29e69a}.bad{color:#ff7181}code{direction:ltr;display:block;overflow-wrap:anywhere}
+</style></head><body><main><h1>فحص تثبيت MikroShamel RADIUS</h1>
+<p>هذه الصفحة تفحص ملفات التثبيت من نفس النطاق.</p><div id="out">جارٍ الفحص…</div>
+<p><a href="/radius/" style="color:#6bc6ff">العودة إلى التطبيق</a></p></main>
+<script>
+(async()=>{
+ const out=document.getElementById('out');
+ const checks=[
+  ['Manifest','/radius/manifest.webmanifest'],
+  ['Service Worker','/radius/service-worker.js'],
+  ['Icon 192','/radius/icons/icon-192.png'],
+  ['Icon 512','/radius/icons/icon-512.png'],
+  ['Maskable 192','/radius/icons/icon-192-maskable.png'],
+  ['Maskable 512','/radius/icons/icon-512-maskable.png']
+ ];
+ let rows=[];
+ for(const [name,url] of checks){
+  try{
+   const r=await fetch(url,{cache:'no-store'});
+   const ct=r.headers.get('content-type')||'(بدون Content-Type)';
+   let detail='HTTP '+r.status+' — '+ct;
+   if(name==='Manifest'&&r.ok){
+    const m=await r.json();
+    detail+=' — start_url: '+m.start_url+' — scope: '+m.scope;
+   }
+   rows.push('<div class="item '+(r.ok?'ok':'bad')+'"><b>'+name+': '+(r.ok?'سليم':'فشل')+'</b><code>'+url+'</code>'+detail+'</div>');
+  }catch(e){rows.push('<div class="item bad"><b>'+name+': فشل</b><code>'+url+'</code>'+String(e)+'</div>');}
+ }
+ let sw='غير مدعوم';
+ if('serviceWorker' in navigator){
+  try{const reg=await navigator.serviceWorker.register('/radius/service-worker.js',{scope:'/radius/'});sw='تم التسجيل — '+reg.scope;}
+  catch(e){sw='فشل التسجيل — '+e;}
+ }
+ rows.push('<div class="item"><b>Secure Context:</b> '+(window.isSecureContext?'نعم':'لا')+'</div>');
+ rows.push('<div class="item"><b>Service Worker:</b> '+sw+'</div>');
+ out.innerHTML=rows.join('');
+})();
+</script></body></html>
