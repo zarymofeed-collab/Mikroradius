@@ -1,14 +1,14 @@
 'use strict';
-const CACHE_NAME = 'mikroshamel-radius-pwa-v15';
-const APP_SCOPE = '/radius/';
+const CACHE_NAME = 'mikroshamel-radius-pwa-v16';
+const APP_SCOPE = '/';
 const APP_SHELL = [
-  '/radius/',
-  '/radius/index.html',
-  '/radius/manifest.webmanifest',
-  '/radius/icons/icon-192.png',
-  '/radius/icons/icon-512.png',
-  '/radius/icons/icon-192-maskable.png',
-  '/radius/icons/icon-512-maskable.png'
+  '/',
+  '/index.html',
+  '/manifest.webmanifest',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/icon-192-maskable.png',
+  '/icons/icon-512-maskable.png'
 ];
 
 self.addEventListener('install', event => {
@@ -38,10 +38,10 @@ self.addEventListener('fetch', event => {
       fetch(req).then(response => {
         if (response && response.ok) {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put('/radius/index.html', copy));
+          caches.open(CACHE_NAME).then(cache => cache.put('/', copy));
         }
         return response;
-      }).catch(() => caches.match('/radius/index.html').then(cached => cached || Response.error()))
+      }).catch(() => caches.match('/').then(cached => cached || Response.error()))
     );
     return;
   }
